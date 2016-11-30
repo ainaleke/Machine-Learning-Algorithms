@@ -1,9 +1,12 @@
 import sys;
+import numpy as np;
+
 
 script, breast_cancer_data,training_labels=sys.argv;
 from logging import DEBUG
 
 prompt='>';
+#pip install numpy pandas
 #python NearestMeans.py   breast_cancer.data   breast_cancer.labels
 #breast cancer data set
 datafile=sys.argv[1]
@@ -72,3 +75,15 @@ print("Mean values with 1 as labels")
 print(mean1)
 
 #Calculate the distance of mean to each test point
+for i in range(0,rows,1):
+    d0=0
+    d1=0
+    if(training_labels[i]!=None):
+        for j in range(0,cols,1):
+            #get the distances from the gradient descent
+            d0+=(mean0[j]-data[i][j])**2
+            d1+=(mean1[j]-data[i][j])**2
+            if(d0<d1):
+                print("0",i)
+            else:
+                print("1",j)
