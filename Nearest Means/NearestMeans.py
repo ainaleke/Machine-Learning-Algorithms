@@ -67,7 +67,7 @@ for i in range(0,rows,1):
 
 for p in range(0,cols,1):
     mean0[p]/=n[0]
-    mean1[p]/n[1]
+    mean1[p]/=n[1]
 print("Mean values with 0 as labels")
 print(mean0)
 
