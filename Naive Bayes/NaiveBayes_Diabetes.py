@@ -38,6 +38,16 @@ std_dev_age=collections.Counter()
 std_dev_twoHourSerum=collections.Counter()
 std_dev_tricepSkinFold=collections.Counter()
 
+#####probability/outcome of each feature with a tested_positive and tested_negative label
+prob_numOfPreg=collections.Counter()
+prob_bodyMassIndex=collections.Counter()
+prob_diabetesPdgreeFxn=collections.Counter()
+prob_diastolicBloodPress=collections.Counter()
+prob_plasmaGlucoseConc=collections.Counter()
+prob_age=collections.Counter()
+prob_twoHourSerum=collections.Counter()
+prob_tricepSkinFold=collections.Counter()
+
 ########Read training data set and get the sum total and the number of occurrences
 def read_training_data(datafile):
     with open(datafile) as f:
