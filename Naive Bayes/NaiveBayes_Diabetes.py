@@ -11,7 +11,7 @@ datafile='training_data.labels'
 ###Mean entries to be calculated
 meanNumOfPreg=collections.Counter()
 meanplasmaGlucoseConc=collections.Counter()
-meandiastolicBlooddPress=collections.Counter()
+meandiastolicBloodPress=collections.Counter()
 meantricepSkinFold=collections.Counter()
 meantwoHourSerum=collections.Counter()
 meanbodyMassIndex=collections.Counter()
@@ -63,7 +63,7 @@ def read_training_data(datafile):
             meanplasmaGlucoseConc[a[8]]+=float(a[1])
             sum_by_class_of_plasma_glucose[a[8]]+=1
 
-            meandiastolicBlooddPress[a[8]]+=float(a[2])
+            meandiastolicBloodPress[a[8]]+=float(a[2])
             sum_by_class_of_diastolic[a[8]]+=1
 
             meantricepSkinFold[a[8]]+=float(a[3])
@@ -101,7 +101,7 @@ def calculateMeanFeatures(datafile):
     calc_mean_of_features(meanNumOfPreg,sum_by_class_of_pregnant)
     calc_mean_of_features(meanbodyMassIndex,sum_by_class_of_bodymassindex)
     calc_mean_of_features(meandiabetesPdgreeFxn,sum_by_class_of_diabetes_pedigree)
-    calc_mean_of_features(meandiastolicBlooddPress,sum_by_class_of_diastolic)
+    calc_mean_of_features(meandiastolicBloodPress, sum_by_class_of_diastolic)
     calc_mean_of_features(meanplasmaGlucoseConc,sum_by_class_of_plasma_glucose)
     calc_mean_of_features(meanage,sum_by_class_of_age)
     calc_mean_of_features(meantwoHourSerum,sum_by_class_of_twohourserum)
@@ -118,7 +118,7 @@ def calculateStdDeviation(datafile):
             ##Calculate the variance of each of the Features with respect to tested_positive or tested_negative
             std_dev_numOfPreg[a[8]]+=((float(a[0])-meanNumOfPreg[a[8]])**2)/(sum_by_class_of_pregnant[a[8]]-1)
             std_dev_plasmaGlucoseConc[a[8]]+=((float(a[1])-meanplasmaGlucoseConc[a[8]])**2)/(sum_by_class_of_plasma_glucose[a[8]]-1)
-            std_dev_diastolicBloodPress[a[8]]+=((float(a[2])-meandiastolicBlooddPress[a[8]])**2)/(sum_by_class_of_diastolic[a[8]]-1)
+            std_dev_diastolicBloodPress[a[8]]+= ((float(a[2]) - meandiastolicBloodPress[a[8]]) ** 2) / (sum_by_class_of_diastolic[a[8]] - 1)
             std_dev_tricepSkinFold[a[8]]+=((float(a[3])-meantricepSkinFold[a[8]])**2)/(sum_by_class_of_tricepskinfold[a[8]]-1)
             std_dev_twoHourSerum[a[8]]+=((float(a[4])-meantwoHourSerum[a[8]])**2)/(sum_by_class_of_twohourserum[a[8]]-1)
             std_dev_bodyMassIndex[a[8]]+=((float(a[5])-meanbodyMassIndex[a[8]])**2)/(sum_by_class_of_bodymassindex[a[8]]-1)
@@ -141,10 +141,35 @@ def get_sqrt_of_features(std_dev_feature):
     for x in std_dev_feature:
         std_dev_feature[x] = math.sqrt(std_dev_feature[x])
 
+def get_prob_values(test_value,mean_of_feature,std_dev_of_feature,tested_label):
+    first_part=1/(math.sqrt((2*math.pi))* float(std_dev_of_feature[tested_label]))
+    second_part=0.5 *((test_value-mean_of_feature[tested_label])/std_dev_of_feature[tested_label])**2
+    result=first_part * math.exp(-1 * second_part)
+    return result
+
+def likelihood_tested_positive(eachline,tested_label):
+    result=0
+    ###tested_label is either tested_positive or tested_negative
+    prob_numOfPreg=get_prob_values(eachline[0],meanNumOfPreg,std_dev_numOfPreg,tested_label)
+    prob_plasmaGlucoseConc=get_prob_values(eachline[1],meanplasmaGlucoseConc,std_dev_plasmaGlucoseConc,tested_label)
+    prob_diastolicBloodPress=get_prob_values(eachline[2], meandiastolicBloodPress, std_dev_diastolicBloodPress, tested_label)
+    prob_tricepSkinFold=get_prob_values(eachline[3],meantricepSkinFold,std_dev_tricepSkinFold,std_dev_tricepSkinFold,tested_label)
+    prob_twoHourSerum=get_prob_values(eachline[4],meantwoHourSerum,std_dev_twoHourSerum,tested_label)
+    prob_bodyMassIndex=get_prob_values(eachline[5],meanbodyMassIndex,std_dev_bodyMassIndex,tested_label)
+    prob_diabetesPdgreeFxn=get_prob_values(eachline[6],meandiabetesPdgreeFxn,std_dev_diabetesPdgreeFxn,tested_label)
+    prob_age=get_prob_values(eachline[7],meanage,std_dev_age,tested_label)
+    return prob_numOfPreg * prob_plasmaGlucoseConc * prob_diastolicBloodPress * prob_tricepSkinFold * prob_twoHourSerum \
+           * prob_bodyMassIndex * prob_diabetesPdgreeFxn * class_probability[tested_label]
+
 read_training_data(datafile)
 print meanNumOfPreg
 calculateMeanFeatures(datafile)
 print num_of_entries
 
 print 'Class', class_probability
-#def predictOutcome():
+
+print math.exp(-1)
+
+
+
+
