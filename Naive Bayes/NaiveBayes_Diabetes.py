@@ -7,6 +7,8 @@ list=[]
 num_of_entries=0
 class_probability=collections.Counter()
 datafile='training_data.labels'
+
+###Mean entries to be calculated
 meanNumOfPreg=collections.Counter()
 meanplasmaGlucoseConc=collections.Counter()
 meandiastolicBlooddPress=collections.Counter()
@@ -15,6 +17,8 @@ meantwoHourSerum=collections.Counter()
 meanbodyMassIndex=collections.Counter()
 meandiabetesPdgreeFxn=collections.Counter()
 meanage=collections.Counter()
+
+###Sum of each label by feature
 sum_by_class_of_pregnant=collections.Counter()
 sum_by_class_of_plasma_glucose=collections.Counter()
 sum_by_class_of_diastolic=collections.Counter()
@@ -24,6 +28,16 @@ sum_by_class_of_bodymassindex=collections.Counter()
 sum_by_class_of_diabetes_pedigree=collections.Counter()
 sum_by_class_of_age=collections.Counter()
 
+####Standard Deviation counters
+std_dev_numOfPreg=collections.Counter()
+std_dev_bodyMassIndex=collections.Counter()
+std_dev_diabetesPdgreeFxn=collections.Counter()
+std_dev_diastolicBloodPress=collections.Counter()
+std_dev_plasmaGlucoseConc=collections.Counter()
+std_dev_age=collections.Counter()
+std_dev_twoHourSerum=collections.Counter()
+std_dev_tricepSkinFold=collections.Counter()
+
 ########Read training data set and get the sum total and the number of occurrences
 def read_training_data(datafile):
     with open(datafile) as f:
@@ -32,7 +46,7 @@ def read_training_data(datafile):
             num+=1
             a=line.rstrip('\n').split(',')
             ##get the conditional probailities ie. tested_negative and tested_positive
-            class_probability[a[8]]+=1
+            class_probability[a[8]]+=float(1)
             meanNumOfPreg[a[8]]+=float(a[0])
             sum_by_class_of_pregnant[a[8]]+=1
 
@@ -60,20 +74,19 @@ def read_training_data(datafile):
     global num_of_entries
     num_of_entries=num
 
-
-def calc_class_conditional_prob():
+    ##Calculate the conditional Probability for both labels tested_positive and tested_negative
     for x in class_probability:
         class_probability[x] /= num_of_entries
-        print 'Class', class_probability[x]
+
 
 #function to calculate mean for each feature
 def calc_mean_of_features(sumTotalCounter,numberOfOccurences):
     for x in sumTotalCounter:
         sumTotalCounter[x] /= numberOfOccurences[x]
-    #return sumTotalCounter
+
 
 ###Calculate the mean for each feature
-def calculateMeanFeatures():
+def calculateMeanFeatures(datafile):
     ###Cycle through each feature and compute the mean
     calc_mean_of_features(meanNumOfPreg,sum_by_class_of_pregnant)
     calc_mean_of_features(meanbodyMassIndex,sum_by_class_of_bodymassindex)
@@ -84,19 +97,8 @@ def calculateMeanFeatures():
     calc_mean_of_features(meantwoHourSerum,sum_by_class_of_twohourserum)
     calc_mean_of_features(meantricepSkinFold,sum_by_class_of_tricepskinfold)
 
-#read_training_data(datafile)
-#calculateMeanFeatures()
-
-###Calculate standard deviation for each feature
-std_dev_numOfPreg=collections.Counter()
-std_dev_bodyMassIndex=collections.Counter()
-std_dev_diabetesPdgreeFxn=collections.Counter()
-std_dev_diastolicBloodPress=collections.Counter()
-std_dev_plasmaGlucoseConc=collections.Counter()
-std_dev_age=collections.Counter()
-std_dev_twoHourSerum=collections.Counter()
-std_dev_tricepSkinFold=collections.Counter()
-
+    ###Calculate standard deviation for each feature
+    calculateStdDeviation(datafile)
 
 def calculateStdDeviation(datafile):
     result=collections.Counter()
@@ -121,35 +123,18 @@ def calculateStdDeviation(datafile):
     get_sqrt_of_features(std_dev_diabetesPdgreeFxn)
     get_sqrt_of_features(std_dev_age)
     get_sqrt_of_features(std_dev_twoHourSerum)
+    print 'Std Dev Age',std_dev_age
+    print 'Std Dev Num preg',std_dev_numOfPreg
 
 ##Calculate the sqrt of features
 def get_sqrt_of_features(std_dev_feature):
     for x in std_dev_feature:
         std_dev_feature[x] = math.sqrt(std_dev_feature[x])
-    #print std_dev_feature
-
-#return result
 
 read_training_data(datafile)
 print meanNumOfPreg
-calculateMeanFeatures()
-calculateStdDeviation(datafile)
+calculateMeanFeatures(datafile)
 print num_of_entries
+
+print 'Class', class_probability
 #def predictOutcome():
-
-print (1-6)**2
-"""
-
-    for x in std_dev_numOfPreg:
-        print 'Sum by class ',sum_by_class_of_pregnant[x]
-        print 'Stand dev ',std_dev_numOfPreg[x]
-
-print sum_by_class_of_pregnant
-print meanNumOfPreg
-print meanplasmaGlucoseConc
-print meandiastolicBlooddPress
-print meantricepSkinFold
-print meantwoHourSerum
-print meanbodyMassIndex
-print meanage
-"""
