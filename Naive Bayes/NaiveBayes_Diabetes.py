@@ -174,9 +174,6 @@ def predict_result(test_datafile):
             else:
                 print 'Result: Tested Positive => ',a
 
-
-
-
 read_training_data(datafile)
 calculateMeanFeatures(datafile)
 predict_result(test_datafile)
