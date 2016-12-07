@@ -147,7 +147,7 @@ def calc_prob_values(test_value, mean_of_feature, std_dev_of_feature, tested_lab
     result=first_part * math.exp(-1 * second_part)
     return result
 
-def likelihood_tested(eachline,tested_label):
+def get_likelihood(eachline, tested_label):
     result=0
     ###tested_label is either tested_positive or tested_negative
     prob_numOfPreg=calc_prob_values(eachline[0], meanNumOfPreg, std_dev_numOfPreg, tested_label)
@@ -167,8 +167,8 @@ def predict_result(test_datafile):
     with open(test_datafile) as f:
         for line in f:
             a=line.rstrip('\n').split(',')
-            likelihood_its_positive=likelihood_tested(a,'tested_positive')
-            likelihood_its_negative=likelihood_tested(a,'tested_negative')
+            likelihood_its_positive=get_likelihood(a, 'tested_positive')
+            likelihood_its_negative=get_likelihood(a, 'tested_negative')
             if(likelihood_its_negative > likelihood_its_positive):
                 print 'Result: Tested Negative => ',a
             else:
