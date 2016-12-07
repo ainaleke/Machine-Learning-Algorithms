@@ -141,32 +141,48 @@ def get_sqrt_of_features(std_dev_feature):
     for x in std_dev_feature:
         std_dev_feature[x] = math.sqrt(std_dev_feature[x])
 
-def get_prob_values(test_value,mean_of_feature,std_dev_of_feature,tested_label):
+def calc_prob_values(test_value, mean_of_feature, std_dev_of_feature, tested_label):
     first_part=1/(math.sqrt((2*math.pi))* float(std_dev_of_feature[tested_label]))
-    second_part=0.5 *((test_value-mean_of_feature[tested_label])/std_dev_of_feature[tested_label])**2
+    second_part=0.5 *((float(test_value)-mean_of_feature[tested_label])/std_dev_of_feature[tested_label])**2
     result=first_part * math.exp(-1 * second_part)
     return result
 
-def likelihood_tested_positive(eachline,tested_label):
+def likelihood_tested(eachline,tested_label):
     result=0
     ###tested_label is either tested_positive or tested_negative
-    prob_numOfPreg=get_prob_values(eachline[0],meanNumOfPreg,std_dev_numOfPreg,tested_label)
-    prob_plasmaGlucoseConc=get_prob_values(eachline[1],meanplasmaGlucoseConc,std_dev_plasmaGlucoseConc,tested_label)
-    prob_diastolicBloodPress=get_prob_values(eachline[2], meandiastolicBloodPress, std_dev_diastolicBloodPress, tested_label)
-    prob_tricepSkinFold=get_prob_values(eachline[3],meantricepSkinFold,std_dev_tricepSkinFold,std_dev_tricepSkinFold,tested_label)
-    prob_twoHourSerum=get_prob_values(eachline[4],meantwoHourSerum,std_dev_twoHourSerum,tested_label)
-    prob_bodyMassIndex=get_prob_values(eachline[5],meanbodyMassIndex,std_dev_bodyMassIndex,tested_label)
-    prob_diabetesPdgreeFxn=get_prob_values(eachline[6],meandiabetesPdgreeFxn,std_dev_diabetesPdgreeFxn,tested_label)
-    prob_age=get_prob_values(eachline[7],meanage,std_dev_age,tested_label)
-    return prob_numOfPreg * prob_plasmaGlucoseConc * prob_diastolicBloodPress * prob_tricepSkinFold * prob_twoHourSerum \
-           * prob_bodyMassIndex * prob_diabetesPdgreeFxn * class_probability[tested_label]
+    prob_numOfPreg=calc_prob_values(eachline[0], meanNumOfPreg, std_dev_numOfPreg, tested_label)
+    prob_plasmaGlucoseConc=calc_prob_values(eachline[1], meanplasmaGlucoseConc, std_dev_plasmaGlucoseConc, tested_label)
+    prob_diastolicBloodPress=calc_prob_values(eachline[2], meandiastolicBloodPress, std_dev_diastolicBloodPress, tested_label)
+    prob_tricepSkinFold=calc_prob_values(eachline[3], meantricepSkinFold, std_dev_tricepSkinFold,tested_label)
+    prob_twoHourSerum=calc_prob_values(eachline[4], meantwoHourSerum, std_dev_twoHourSerum, tested_label)
+    prob_bodyMassIndex=calc_prob_values(eachline[5], meanbodyMassIndex, std_dev_bodyMassIndex, tested_label)
+    prob_diabetesPdgreeFxn=calc_prob_values(eachline[6], meandiabetesPdgreeFxn, std_dev_diabetesPdgreeFxn, tested_label)
+    prob_age=calc_prob_values(eachline[7], meanage, std_dev_age, tested_label)
+    result= prob_numOfPreg * prob_plasmaGlucoseConc * prob_diastolicBloodPress * prob_tricepSkinFold * prob_twoHourSerum \
+           * prob_bodyMassIndex * prob_diabetesPdgreeFxn * prob_age * class_probability[tested_label]
+    return result
+
+test_datafile='diabetes_testdata.data'
+def predict_result(test_datafile):
+    with open(test_datafile) as f:
+        for line in f:
+            a=line.rstrip('\n').split(',')
+            likelihood_its_positive=likelihood_tested(a,'tested_positive')
+            likelihood_its_negative=likelihood_tested(a,'tested_negative')
+            if(likelihood_its_negative > likelihood_its_positive):
+                print 'Result: Tested Negative => ',a
+            else:
+                print 'Result: Tested Positive => ',a
+
+
+
 
 read_training_data(datafile)
-print meanNumOfPreg
 calculateMeanFeatures(datafile)
-print num_of_entries
+predict_result(test_datafile)
+#print num_of_entries
 
-print 'Class', class_probability
+#print 'Class', class_probability
 
 print math.exp(-1)
 
