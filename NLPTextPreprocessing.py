@@ -6,7 +6,18 @@ from sklearn.datasets import fetch_20newsgroups
 from nltk.corpus import names
 from nltk.stem import WordNetLemmatizer
 
+"""
+Using the Natural Language toolkit, we try to pick out 500 meaningful words ignoring english stop words like(a, an the etc.)
+from the fetch_20newsgroups dataset, using the nltk.corpus.names dataset as our dictionary for meaningful words
+
+"""
+
 def letters_only(str):
+    """
+    This function checks a string if all characters are letters
+    :param str:
+    :return: Boolean
+    """
     return str.isalpha()
 
 cv=CountVectorizer(stop_words="english", max_features=500)
