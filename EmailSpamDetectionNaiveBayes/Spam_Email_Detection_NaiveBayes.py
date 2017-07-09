@@ -47,11 +47,17 @@ def get_class_prob(labels):
 
     prior = {}
     for class_, index in label_index.iteritems():
-        print len(index)
-        #prior[class_] = len(index)
+        prior[class_] = len(index)
 
+    print prior
     #Get total count of all labels in the list
-    #total_label_count = sum(label_index.values())
+    total_label_count = sum(prior.values())
+
+    #Get prior/probability of each class by dividing each value by the total number of labels present
+    for label in prior:
+        prior[label] /= float(total_label_count)
+
+    return prior
 
 get_class_prob(labels)
 
